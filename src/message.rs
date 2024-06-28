@@ -319,14 +319,6 @@ pub struct OauthConfigSpecification {
     /// For each field, a special annotation `path_in_connector_config` can be specified to
     /// determine where to merge it,
     ///
-    /// Examples:
-    ///
-    ///     complete_oauth_output_specification={
-    ///       refresh_token: {
-    ///         type: string,
-    ///         path_in_connector_config: ['credentials', 'refresh_token']
-    ///       }
-    ///     }
     #[serde(skip_serializing_if = "Option::is_none")]
     pub complete_oauth_output_specification: Option<HashMap<String, serde_json::Value>>,
     /// OAuth specific blob. This is a Json Schema used to validate Json configurations persisted
@@ -335,16 +327,6 @@ pub struct OauthConfigSpecification {
     /// Instance or Workspace Admins to be used by the
     /// server when completing an OAuth flow (typically exchanging an auth code for refresh token).
     ///
-    /// Examples:
-    ///
-    ///     complete_oauth_server_input_specification={
-    ///       client_id: {
-    ///         type: string
-    ///       },
-    ///       client_secret: {
-    ///         type: string
-    ///       }
-    ///     }
     #[serde(skip_serializing_if = "Option::is_none")]
     pub complete_oauth_server_input_specification: Option<HashMap<String, serde_json::Value>>,
     /// OAuth specific blob. This is a Json Schema used to validate Json configurations persisted
@@ -363,18 +345,6 @@ pub struct OauthConfigSpecification {
     /// For each field, a special annotation `path_in_connector_config` can be specified to
     /// determine where to merge it,
     ///
-    /// Examples:
-    ///
-    ///       complete_oauth_server_output_specification={
-    ///         client_id: {
-    ///           type: string,
-    ///           path_in_connector_config: ['credentials', 'client_id']
-    ///         },
-    ///         client_secret: {
-    ///           type: string,
-    ///           path_in_connector_config: ['credentials', 'client_secret']
-    ///         }
-    ///       }
     #[serde(skip_serializing_if = "Option::is_none")]
     pub complete_oauth_server_output_specification: Option<HashMap<String, serde_json::Value>>,
     /// OAuth specific blob. This is a Json Schema used to validate Json configurations used as
@@ -386,26 +356,6 @@ pub struct OauthConfigSpecification {
     /// connector, that might also shared
     /// as inputs for syncing data via the connector.
     ///
-    /// Examples:
-    ///
-    /// if no connector values is shared during oauth flow,
-    /// oauth_user_input_from_connector_config_specification=[]
-    /// if connector values such as 'app_id' inside the top level are used to generate the API url
-    /// for the oauth flow,
-    ///   oauth_user_input_from_connector_config_specification={
-    ///     app_id: {
-    ///       type: string
-    ///       path_in_connector_config: ['app_id']
-    ///     }
-    ///   }
-    /// if connector values such as 'info.app_id' nested inside another object are used to generate
-    /// the API url for the oauth flow,
-    ///   oauth_user_input_from_connector_config_specification={
-    ///     app_id: {
-    ///       type: string
-    ///       path_in_connector_config: ['info', 'app_id']
-    ///     }
-    ///   }
     #[serde(skip_serializing_if = "Option::is_none")]
     pub oauth_user_input_from_connector_config_specification:
         Option<HashMap<String, serde_json::Value>>,
@@ -555,4 +505,54 @@ pub struct AirbyteErrorTraceMessage {
     /// The stream associated with the error, if known (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stream_descriptor: Option<StreamDescriptor>,
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+
+    use crate::message::AirbyteRecordMessage;
+
+    #[test]
+    fn test_airbyterecordmessage_serialization() {
+        let data = HashMap::from([
+            (
+                "key1".to_string(),
+                serde_json::Value::String("value1".to_string()),
+            ),
+            (
+                "key2".to_string(),
+                serde_json::Value::Number(serde_json::Number::from(42)),
+            ),
+        ]);
+        let message = AirbyteRecordMessage {
+            data,
+            emitted_at: 1234567890,
+            meta: None,
+            namespace: Some("my_namespace".to_string()),
+            stream: "my_stream".to_string(),
+        };
+
+        let serialized = serde_json::to_string(&message).unwrap();
+        assert!(serialized.contains("\"data\":{\"key1\":\"value1\",\"key2\":42}"));
+        assert!(serialized.contains("\"emitted_at\":1234567890"));
+        assert!(serialized.contains("\"namespace\":\"my_namespace\""));
+        assert!(serialized.contains("\"stream\":\"my_stream\""));
+    }
+
+    #[test]
+    fn test_airbyterecordmessage_deserialization() {
+        let json = r#"{
+            "data": {"key1": "value1", "key2": 42},
+            "emitted_at": 1234567890,
+            "namespace": "my_namespace",
+            "stream": "my_stream"
+        }"#;
+
+        let message: AirbyteRecordMessage = serde_json::from_str(json).unwrap();
+        assert_eq!(message.data.len(), 2);
+        assert_eq!(message.emitted_at, 1234567890);
+        assert_eq!(message.namespace, Some("my_namespace".to_string()));
+        assert_eq!(message.stream, "my_stream".to_string());
+    }
 }

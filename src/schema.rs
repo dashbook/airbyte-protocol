@@ -15,15 +15,6 @@ pub struct JsonSchema {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum Type {
-    Primitive {
-        r#type: Primitive,
-    },
-    Single {
-        r#type: [Primitive; 1],
-    },
-    Variant {
-        r#type: [Primitive; 2],
-    },
     PrimitiveFormat {
         r#type: PrimitiveFormat,
         format: Format,
@@ -35,6 +26,15 @@ pub enum Type {
     VariantFormat {
         r#type: [PrimitiveFormat; 2],
         format: Format,
+    },
+    Primitive {
+        r#type: Primitive,
+    },
+    Single {
+        r#type: [Primitive; 1],
+    },
+    Variant {
+        r#type: [Primitive; 2],
     },
     Compound(Compound),
     Empty(Empty),
