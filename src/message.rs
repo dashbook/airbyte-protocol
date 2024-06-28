@@ -382,8 +382,9 @@ pub struct AirbyteLogMessage {
     pub stack_trace: Option<String>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum SyncMode {
+    #[default]
     #[serde(rename = "full_refresh")]
     FullRefresh,
     #[serde(rename = "incremental")]
