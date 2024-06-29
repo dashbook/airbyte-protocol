@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::schema::JsonSchema;
 
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(rename = "SCREAMING_SNAKE_CASE", tag = "type")]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE", tag = "type")]
 pub enum AirbyteMessage {
     Catalog {
         catalog: AirbyteCatalog,
@@ -34,7 +34,7 @@ pub enum AirbyteMessage {
     },
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteRecordMessage {
     /// record data
     pub data: HashMap<String, serde_json::Value>,
@@ -50,14 +50,14 @@ pub struct AirbyteRecordMessage {
     pub stream: String,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteRecordMessageMeta {
     /// Lists of changes to the content of this record which occurred during syncing
     #[serde(skip_serializing_if = "Option::is_none")]
     pub changes: Option<Vec<AirbyteRecordMessageMetaChange>>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteRecordMessageMetaChange {
     /// The type of change that occurred
     pub change: String,
@@ -74,7 +74,7 @@ pub struct AirbyteRecordMessageMetaChange {
 /// PER_STREAM means that the state should be read from `stream`. The state present in this field
 /// correspond to the isolated state of the associated stream description.
 ///
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename = "SCREAMING_SNAKE_CASE", tag = "type")]
 pub enum AirbyteStateMessage {
     Global {
@@ -108,28 +108,28 @@ pub enum AirbyteStateMessage {
     },
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteGlobalState {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shared_state: Option<HashMap<String, serde_json::Value>>,
     pub stream_states: Vec<AirbyteStreamState>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteStreamState {
     pub stream_descriptor: StreamDescriptor,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stream_state: Option<HashMap<String, serde_json::Value>>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct StreamDescriptor {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub namespace: Option<String>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteStateStats {
     /// the number of records which were emitted for this state message, for this stream or global.
     /// While the value should always be a round number, it is defined as a double to account for
@@ -140,13 +140,13 @@ pub struct AirbyteStateStats {
     pub record_count: Option<f64>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 /// Airbyte stream schema catalog
 pub struct AirbyteCatalog {
     pub streams: Vec<AirbyteStream>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteStream {
     /// Stream's name.
     pub name: String,
@@ -184,13 +184,13 @@ pub struct AirbyteStream {
     pub supported_sync_modes: Vec<SyncMode>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 /// Airbyte stream schema catalog
 pub struct ConfiguredAirbyteCatalog {
     pub streams: Vec<ConfiguredAirbyteStream>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ConfiguredAirbyteStream {
     /// Path to the field that will be used to determine if a record is new or modified since the
     /// last sync. This field is REQUIRED if `sync_mode` is `incremental`. Otherwise it is ignored.
@@ -227,7 +227,7 @@ pub struct ConfiguredAirbyteStream {
     pub sync_mode: SyncMode,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 /// Airbyte connection status
 pub struct AirbyteConnectionStatus {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -235,7 +235,7 @@ pub struct AirbyteConnectionStatus {
     pub status: String,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename = "SCREAMING_SNAKE_CASE", tag = "type")]
 pub enum AirbyteControlMessage {
     ConnectorConfig {
@@ -244,14 +244,14 @@ pub enum AirbyteControlMessage {
     },
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteControlConnectorConfigMessage {
     /// the config items from this connector's spec to update
     pub config: HashMap<String, serde_json::Value>,
 }
 
 /// Specification of a connector (source/destination)
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ConnectorSpecification {
     /// Additional and optional specification object to describe what an 'advanced' Auth flow would
     /// need to function.
@@ -293,7 +293,7 @@ pub struct ConnectorSpecification {
     pub supports_normalization: Option<bool>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ConnectorSpecificationAdvancedAuth {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub auth_flow_type: Option<String>,
@@ -308,7 +308,7 @@ pub struct ConnectorSpecificationAdvancedAuth {
     pub predicate_value: Option<String>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename = "OAuthConfigSpecification")]
 pub struct OauthConfigSpecification {
     /// OAuth specific blob. This is a Json Schema used to validate Json configurations produced by
@@ -361,7 +361,7 @@ pub struct OauthConfigSpecification {
         Option<HashMap<String, serde_json::Value>>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum DestinationSyncMode {
     #[serde(rename = "append")]
     Append,
@@ -371,7 +371,7 @@ pub enum DestinationSyncMode {
     AppendDedup,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteLogMessage {
     /// log level
     pub level: String,
@@ -382,7 +382,7 @@ pub struct AirbyteLogMessage {
     pub stack_trace: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 pub enum SyncMode {
     #[default]
     #[serde(rename = "full_refresh")]
@@ -391,7 +391,7 @@ pub enum SyncMode {
     Incremental,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename = "SCREAMING_SNAKE_CASE", tag = "type")]
 pub enum AirbyteTraceMessage {
     Analytics {
@@ -412,7 +412,7 @@ pub enum AirbyteTraceMessage {
     },
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteStreamStatusTraceMessage {
     /// The reasons associated with the status of the stream
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -425,7 +425,7 @@ pub struct AirbyteStreamStatusTraceMessage {
 
 /// The current status of a stream within the context of an executing synchronization job.
 ///
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename = "UPPERCASE")]
 pub enum AirbyteStreamStatus {
     Started,
@@ -436,7 +436,7 @@ pub enum AirbyteStreamStatus {
 
 /// The reason associated with the status of the stream.
 ///
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteStreamStatusReason {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rate_limited: Option<AirbyteStreamStatusRateLimitedReason>,
@@ -445,7 +445,7 @@ pub struct AirbyteStreamStatusReason {
 }
 
 /// Rate Limited Information
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteStreamStatusRateLimitedReason {
     /// Optional time in ms representing when the API quota is going to be reset
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -454,13 +454,13 @@ pub struct AirbyteStreamStatusRateLimitedReason {
 
 /// Type of reason
 ///
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum AirbyteStreamStatusReasonType {
     #[serde(rename = "RATE_LIMITED")]
     RateLimited,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteEstimateTraceMessage {
     /// The estimated number of bytes to be emitted by this sync for this stream
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -481,7 +481,7 @@ pub struct AirbyteEstimateTraceMessage {
 /// an event with a type and an optional payload value (both of them being strings). The event
 /// types should not be dynamically generated but defined statically. The payload value is optional
 /// and can contain arbitrary strings.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteAnalyticsTraceMessage {
     /// The value of the event - can be an arbitrary string. In case the value is numeric, it
     /// should be converted to a string. Casting for analytics purposes can happen in the
@@ -490,7 +490,7 @@ pub struct AirbyteAnalyticsTraceMessage {
     pub value: Option<String>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteErrorTraceMessage {
     /// The type of error
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -509,51 +509,31 @@ pub struct AirbyteErrorTraceMessage {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use std::collections::HashMap;
 
-    use crate::message::AirbyteRecordMessage;
+    use serde_json::json;
+
+    use crate::message::{AirbyteMessage, AirbyteRecordMessage};
 
     #[test]
-    fn test_airbyterecordmessage_serialization() {
-        let data = HashMap::from([
-            (
-                "key1".to_string(),
-                serde_json::Value::String("value1".to_string()),
-            ),
-            (
-                "key2".to_string(),
-                serde_json::Value::Number(serde_json::Number::from(42)),
-            ),
-        ]);
-        let message = AirbyteRecordMessage {
-            data,
-            emitted_at: 1234567890,
-            meta: None,
-            namespace: Some("my_namespace".to_string()),
-            stream: "my_stream".to_string(),
+    fn test_record() {
+        let input = r#"{"type": "RECORD", "record": { "stream": "users", "data": {"id": 1, "name": "Chris"}, "emitted_at": 1}}"#;
+
+        let record: AirbyteMessage = serde_json::from_str(input).unwrap();
+
+        let expected = AirbyteMessage::Record {
+            record: AirbyteRecordMessage {
+                stream: "users".to_string(),
+                data: HashMap::from_iter(vec![
+                    ("id".to_owned(), json!(1)),
+                    ("name".to_owned(), json!("Chris")),
+                ]),
+                emitted_at: 1,
+                meta: None,
+                namespace: None,
+            },
         };
-
-        let serialized = serde_json::to_string(&message).unwrap();
-        assert!(serialized.contains("\"data\":{\"key1\":\"value1\",\"key2\":42}"));
-        assert!(serialized.contains("\"emitted_at\":1234567890"));
-        assert!(serialized.contains("\"namespace\":\"my_namespace\""));
-        assert!(serialized.contains("\"stream\":\"my_stream\""));
-    }
-
-    #[test]
-    fn test_airbyterecordmessage_deserialization() {
-        let json = r#"{
-            "data": {"key1": "value1", "key2": 42},
-            "emitted_at": 1234567890,
-            "namespace": "my_namespace",
-            "stream": "my_stream"
-        }"#;
-
-        let message: AirbyteRecordMessage = serde_json::from_str(json).unwrap();
-        assert_eq!(message.data.len(), 2);
-        assert_eq!(message.emitted_at, 1234567890);
-        assert_eq!(message.namespace, Some("my_namespace".to_string()));
-        assert_eq!(message.stream, "my_stream".to_string());
+        assert_eq!(record, expected);
     }
 }
