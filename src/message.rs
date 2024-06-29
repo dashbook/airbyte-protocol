@@ -122,11 +122,20 @@ pub struct AirbyteStreamState {
     pub stream_state: Option<HashMap<String, serde_json::Value>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct StreamDescriptor {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub namespace: Option<String>,
+}
+
+impl StreamDescriptor {
+    pub fn new(name: &str, namespace: Option<&str>) -> Self {
+        Self {
+            name: name.to_owned(),
+            namespace: namespace.map(ToOwned::to_owned),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
