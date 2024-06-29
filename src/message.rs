@@ -75,7 +75,7 @@ pub struct AirbyteRecordMessageMetaChange {
 /// correspond to the isolated state of the associated stream description.
 ///
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename = "SCREAMING_SNAKE_CASE", tag = "type")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE", tag = "type")]
 pub enum AirbyteStateMessage {
     Global {
         global: AirbyteGlobalState,
@@ -122,7 +122,7 @@ pub struct AirbyteStreamState {
     pub stream_state: Option<HashMap<String, serde_json::Value>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Hash)]
 pub struct StreamDescriptor {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -236,7 +236,7 @@ pub struct AirbyteConnectionStatus {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename = "SCREAMING_SNAKE_CASE", tag = "type")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE", tag = "type")]
 pub enum AirbyteControlMessage {
     ConnectorConfig {
         connector_config: AirbyteControlConnectorConfigMessage,
@@ -392,7 +392,7 @@ pub enum SyncMode {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename = "SCREAMING_SNAKE_CASE", tag = "type")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE", tag = "type")]
 pub enum AirbyteTraceMessage {
     Analytics {
         analytics: AirbyteAnalyticsTraceMessage,
@@ -426,7 +426,7 @@ pub struct AirbyteStreamStatusTraceMessage {
 /// The current status of a stream within the context of an executing synchronization job.
 ///
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename = "UPPERCASE")]
+#[serde(rename_all = "UPPERCASE")]
 pub enum AirbyteStreamStatus {
     Started,
     Running,
