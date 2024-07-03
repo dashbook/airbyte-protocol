@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
 use crate::schema::JsonSchema;
@@ -37,7 +35,7 @@ pub enum AirbyteMessage {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteRecordMessage {
     /// record data
-    pub data: HashMap<String, serde_json::Value>,
+    pub data: serde_json::Value,
     /// when the data was emitted from the source. epoch in millisecond.
     pub emitted_at: i64,
     /// Information about this record added mid-sync
@@ -79,31 +77,31 @@ pub struct AirbyteRecordMessageMetaChange {
 pub enum AirbyteStateMessage {
     Global {
         global: AirbyteGlobalState,
-        #[serde(rename = "destinationStats")]
+        #[serde(rename = "destinationStats", skip_serializing_if = "Option::is_none")]
         destination_stats: Option<AirbyteStateStats>,
-        #[serde(rename = "sourceStats")]
+        #[serde(rename = "sourceStats", skip_serializing_if = "Option::is_none")]
         source_stats: Option<AirbyteStateStats>,
     },
     Stream {
         stream: AirbyteStreamState,
-        #[serde(rename = "destinationStats")]
+        #[serde(rename = "destinationStats", skip_serializing_if = "Option::is_none")]
         destination_stats: Option<AirbyteStateStats>,
-        #[serde(rename = "sourceStats")]
+        #[serde(rename = "sourceStats", skip_serializing_if = "Option::is_none")]
         source_stats: Option<AirbyteStateStats>,
     },
     Legacy {
-        data: HashMap<String, serde_json::Value>,
-        #[serde(rename = "destinationStats")]
+        data: serde_json::Value,
+        #[serde(rename = "destinationStats", skip_serializing_if = "Option::is_none")]
         destination_stats: Option<AirbyteStateStats>,
-        #[serde(rename = "sourceStats")]
+        #[serde(rename = "sourceStats", skip_serializing_if = "Option::is_none")]
         source_stats: Option<AirbyteStateStats>,
     },
     #[serde(untagged)]
     Empty {
-        data: HashMap<String, serde_json::Value>,
-        #[serde(rename = "destinationStats")]
+        data: serde_json::Value,
+        #[serde(rename = "destinationStats", skip_serializing_if = "Option::is_none")]
         destination_stats: Option<AirbyteStateStats>,
-        #[serde(rename = "sourceStats")]
+        #[serde(rename = "sourceStats", skip_serializing_if = "Option::is_none")]
         source_stats: Option<AirbyteStateStats>,
     },
 }
@@ -111,7 +109,7 @@ pub enum AirbyteStateMessage {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteGlobalState {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub shared_state: Option<HashMap<String, serde_json::Value>>,
+    pub shared_state: Option<serde_json::Value>,
     pub stream_states: Vec<AirbyteStreamState>,
 }
 
@@ -119,7 +117,7 @@ pub struct AirbyteGlobalState {
 pub struct AirbyteStreamState {
     pub stream_descriptor: StreamDescriptor,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub stream_state: Option<HashMap<String, serde_json::Value>>,
+    pub stream_state: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
@@ -256,7 +254,7 @@ pub enum AirbyteControlMessage {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AirbyteControlConnectorConfigMessage {
     /// the config items from this connector's spec to update
-    pub config: HashMap<String, serde_json::Value>,
+    pub config: serde_json::Value,
 }
 
 /// Specification of a connector (source/destination)
@@ -278,7 +276,7 @@ pub struct ConnectorSpecification {
     pub changelog_url: Option<String>,
     /// ConnectorDefinition specific blob. Must be a valid JSON string.
     #[serde(rename = "connectionSpecification")]
-    pub connection_specification: HashMap<String, serde_json::Value>,
+    pub connection_specification: serde_json::Value,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "documentationUrl")]
     pub documentation_url: Option<String>,
@@ -329,7 +327,7 @@ pub struct OauthConfigSpecification {
     /// determine where to merge it,
     ///
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub complete_oauth_output_specification: Option<HashMap<String, serde_json::Value>>,
+    pub complete_oauth_output_specification: Option<serde_json::Value>,
     /// OAuth specific blob. This is a Json Schema used to validate Json configurations persisted
     /// as Airbyte Server configurations.
     /// Must be a valid non-nested JSON describing additional fields configured by the Airbyte
@@ -337,7 +335,7 @@ pub struct OauthConfigSpecification {
     /// server when completing an OAuth flow (typically exchanging an auth code for refresh token).
     ///
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub complete_oauth_server_input_specification: Option<HashMap<String, serde_json::Value>>,
+    pub complete_oauth_server_input_specification: Option<serde_json::Value>,
     /// OAuth specific blob. This is a Json Schema used to validate Json configurations persisted
     /// as Airbyte Server configurations that
     /// also need to be merged back into the connector configuration at runtime.
@@ -355,7 +353,7 @@ pub struct OauthConfigSpecification {
     /// determine where to merge it,
     ///
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub complete_oauth_server_output_specification: Option<HashMap<String, serde_json::Value>>,
+    pub complete_oauth_server_output_specification: Option<serde_json::Value>,
     /// OAuth specific blob. This is a Json Schema used to validate Json configurations used as
     /// input to OAuth.
     /// Must be a valid non-nested JSON that refers to properties from
@@ -366,8 +364,7 @@ pub struct OauthConfigSpecification {
     /// as inputs for syncing data via the connector.
     ///
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub oauth_user_input_from_connector_config_specification:
-        Option<HashMap<String, serde_json::Value>>,
+    pub oauth_user_input_from_connector_config_specification: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -519,7 +516,6 @@ pub struct AirbyteErrorTraceMessage {
 
 #[cfg(test)]
 pub mod tests {
-    use std::collections::HashMap;
 
     use serde_json::json;
 
@@ -534,10 +530,7 @@ pub mod tests {
         let expected = AirbyteMessage::Record {
             record: AirbyteRecordMessage {
                 stream: "users".to_string(),
-                data: HashMap::from_iter(vec![
-                    ("id".to_owned(), json!(1)),
-                    ("name".to_owned(), json!("Chris")),
-                ]),
+                data: json!({"id": 1, "name": "Chris"}),
                 emitted_at: 1,
                 meta: None,
                 namespace: None,
